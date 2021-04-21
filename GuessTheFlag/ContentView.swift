@@ -6,23 +6,24 @@
 //
 /*
  
- If something important happens, a common way of notifying the user is using an alert –
- a pop up window that contains a title, message, and one or two buttons
- depending on what you need.
+ In order for this game to be fun, we need to randomize the order in which flags are shown,
+ trigger an alert telling them whether they were right or wrong whenever they
+ tap a flag, then reshuffle the flags.
 
- But think about it: when should an alert be shown and how? Views are a function of our program state,
- and alerts aren’t an exception to that. So, rather than
- saying “show the alert”, we instead create our alert and set the conditions under which it should be shown.
-
- A basic SwiftUI alert has a title, message, and one dismiss button, like this:
+ We already set correctAnswer to a random integer, but the flags always start in the same order.
+ To fix that we need to shuffle the countries array when the game starts,
+ so modify the property to this:
  
  */
 
 import SwiftUI
 
 struct ContentView: View {
-    var countries = ["Estonia", "France", "Germany", "Ireland", "Italy", "Nigeria","Poland", "Russia", "Spain", "UK", "US"]
-    var correctAnswer = Int.random(in: 0...2)
+    @State private var countries = ["Estonia", "France", "Germany", "Ireland", "Italy", "Nigeria","Poland", "Russia", "Spain", "UK", "US"].shuffled()
+    @State private var correctAnswer = Int.random(in: 0...2)
+    
+    @State private var showingScore = false
+    @State private var scoreTitle = ""
     
     var body: some View {
         
@@ -40,6 +41,7 @@ struct ContentView: View {
                 ForEach(0 ..< 3){number in
                     Button(action: {
                         // flag was tapped
+                        self.flagTapped(number)
                     }) {
                         Image(self.countries[number])
                             .renderingMode(.original)
@@ -50,22 +52,33 @@ struct ContentView: View {
                 
             }
             
+        }.alert(isPresented: $showingScore){
+            Alert(title:Text(scoreTitle),message:
+                  Text("Your score is ???"),
+                  dismissButton: .default(Text("Continue")){
+                    self.askQuestion()
+                  }
+                  )
+            
+        }
+    }
+    
+    func flagTapped(_ number: Int){
+        if number == correctAnswer {
+            scoreTitle = "Correct"
+        } else {
+            scoreTitle = "Wrong"
         }
         
-        
-        
-        
-        
-        
-           
-            
-            
-        
-        
-        
-        
-        
+        showingScore = true
     }
+    
+    func askQuestion(){
+        countries.shuffle()
+        correctAnswer = Int.random(in: 0...2)
+    }
+    
+    
 }
 
 struct ContentView_Previews: PreviewProvider {
