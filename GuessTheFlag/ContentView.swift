@@ -6,30 +6,37 @@
 //
 /*
  
- Buttons in SwiftUI can be made in two ways depending on how they should look.
+ If something important happens, a common way of notifying the user is using an alert –
+ a pop up window that contains a title, message, and one or two buttons
+ depending on what you need.
 
- The simplest way to make a button is when it just contains some text: you pass in the title of the button,
- along with a closure that should be run when the button is tapped:
+ But think about it: when should an alert be shown and how? Views are a function of our program state,
+ and alerts aren’t an exception to that. So, rather than
+ saying “show the alert”, we instead create our alert and set the conditions under which it should be shown.
+
+ A basic SwiftUI alert has a title, message, and one dismiss button, like this:
  
  */
 
 import SwiftUI
 
 struct ContentView: View {
+    @State private var showingAlert = false
+    
     var body: some View {
-        Button(action: {
-            print("button was tapped")
-        }) {
-            HStack(spacing:10){
-                Image(systemName: "pencil")
-                    .renderingMode(.original)
-                Text("Edit")
-                
-            }
-            
-            
+        Button("Show Alert") {
+            self.showingAlert = true
+        }
+        .alert(isPresented: $showingAlert){
+            Alert(title:Text("Hello SwiftUI"),
+                  message: Text("This is some detail message"),
+                  dismissButton: .default(Text("Ok")))
             
         }
+        
+        
+        
+        
     }
 }
 
